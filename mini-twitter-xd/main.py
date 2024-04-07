@@ -1,5 +1,5 @@
 from datetime import datetime
-from flask import Flask, render_template, url_for, flash, redirect
+from flask import Flask, render_template, url_for, flash, redirect, session
 from flask_sqlalchemy import SQLAlchemy
 from forms import RegistrationForm, LoginForm
 
@@ -35,13 +35,13 @@ class Post(db.Model):
 
 posts = [
     {
-        'author': 'Corey Schafer',
+        'author': 'Krutoj Sigma',
         'title': 'Blog Post 1',
         'content': 'First post content',
         'date_posted': 'April 20, 2018'
     },
     {
-        'author': 'Jane Doe',
+        'author': 'Sigma Shvebs',
         'title': 'Blog Post 2',
         'content': 'Second post content',
         'date_posted': 'April 21, 2018'
@@ -57,7 +57,7 @@ def home():
 
 @app.route("/about")
 def about():
-    return render_template('about.html', title='About')
+    return render_template('about.html', title='Про нас')
 
 
 @app.route("/register", methods=['GET', 'POST'])
@@ -65,21 +65,25 @@ def register():
     form = RegistrationForm()
 
     if form.validate_on_submit():
-        flash(f'Account created for {form.username.data}!', 'success')
+        flash(f'Акаунт створено успішно для {form.username.data}!', 'success')
+        sigma_user = User(username=form.username.data, email=form.email.data, password=form.password.data)
+        db.session.add(sigma_user)
+        db.session.commit()
         return redirect(url_for('home'))
-    return render_template('register.html', title='Register', form=form)
+    return render_template('register.html', title='Реєстрація', form=form)
 
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
+        db.session.get(User, )
         if form.email.data == 'admin@blog.com' and form.password.data == 'password':
-            flash('You have been logged in!', 'success')
+            flash('Ви успішно увійшли!', 'success')
             return redirect(url_for('home'))
         else:
-            flash('Login Unsuccessful. Please check username and password', 'danger')
-    return render_template('login.html', title='Login', form=form)
+            flash('Неможливо увійти. Будь ласка перевірте свій нік і пароль', 'danger')
+    return render_template('login.html', title='Вхід', form=form)
 
 
 if __name__ == '__main__':
